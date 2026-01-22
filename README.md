@@ -55,8 +55,12 @@ KaliRat is a Remote Access Trojan (RAT) that demonstrates how attackers can cont
 KaliRat_Bot/
 ├── main.js           # C2 Server (Command & Control)
 ├── package.json      # Node.js dependencies
-├── data.json         # Configuration (EDIT THIS)
+├── .env.example      # Environment variables template
+├── .env              # Your configuration (create this)
+├── setup.sh          # Interactive setup script
 ├── CLIENT_src.apk    # Android client payload
+├── SECURITY.md       # Security policy
+├── LICENSE           # MIT License
 └── README.md         # This file
 ```
 
@@ -64,39 +68,85 @@ KaliRat_Bot/
 
 ## Configuration
 
-### Step 1: Edit `data.json`
+This project uses **environment variables** (`.env` file) for configuration.
 
-Open `data.json` and configure the following:
+### Quick Setup (Recommended)
 
-```json
-{
-    "token": "YOUR_TELEGRAM_BOT_TOKEN",
-    "id": "YOUR_TELEGRAM_CHAT_ID",
-    "host": "YOUR_SERVER_URL",
-    "text": "Optional broadcast message"
-}
+Run the interactive setup script:
+
+```bash
+# Run setup wizard
+npm run setup
+# or
+bash setup.sh
 ```
 
-| Field | Description | How to Get |
-|-------|-------------|------------|
-| `token` | Telegram Bot API Token | Create bot via [@BotFather](https://t.me/BotFather) |
-| `id` | Your Telegram Chat ID | Message [@userinfobot](https://t.me/userinfobot) |
-| `host` | Your server's public URL | Deploy to Render/Heroku/VPS |
-| `text` | SMS broadcast message | Optional - for mass SMS feature |
+The script will:
+1. Check Node.js and npm
+2. Install dependencies
+3. Create `.env` from template
+4. Prompt for your credentials
+5. Verify configuration
 
-### Step 2: Create Telegram Bot
+### Manual Setup
 
-1. Open Telegram and search for `@BotFather`
+#### Step 1: Create `.env` file
+
+```bash
+# Copy the template
+cp .env.example .env
+
+# Edit with your values
+nano .env
+```
+
+#### Step 2: Configure environment variables
+
+```bash
+# ===========================================
+# REQUIRED
+# ===========================================
+
+# Telegram Bot Token (from @BotFather)
+BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+
+# Your Telegram Chat ID (from @userinfobot)
+ADMIN_CHAT_ID=1234567890
+
+# ===========================================
+# OPTIONAL
+# ===========================================
+
+# Server port (default: 3000)
+PORT=3000
+
+# Public URL for keep-alive pings
+HOST_URL=https://your-app.onrender.com/
+
+# SMS broadcast message
+BROADCAST_TEXT=
+```
+
+| Variable | Required | Description | How to Get |
+|----------|----------|-------------|------------|
+| `BOT_TOKEN` | Yes | Telegram Bot API Token | [@BotFather](https://t.me/BotFather) → /newbot |
+| `ADMIN_CHAT_ID` | Yes | Your Telegram Chat ID | [@userinfobot](https://t.me/userinfobot) |
+| `PORT` | No | Server listening port | Default: 3000 |
+| `HOST_URL` | No | Server URL for pings | Your deployment URL |
+| `BROADCAST_TEXT` | No | SMS broadcast message | Optional |
+
+#### Step 3: Get Telegram Credentials
+
+**Bot Token:**
+1. Open Telegram → Search `@BotFather`
 2. Send `/newbot`
 3. Follow prompts to name your bot
-4. Copy the API token (looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
-5. Paste into `data.json` as `token`
+4. Copy the token (format: `123456789:ABCdefGHI...`)
 
-### Step 3: Get Your Chat ID
-
-1. Message `@userinfobot` on Telegram
-2. It will reply with your ID (a number like `5475190265`)
-3. Paste into `data.json` as `id`
+**Chat ID:**
+1. Open Telegram → Search `@userinfobot`
+2. Send any message
+3. Copy the ID number it returns
 
 ---
 
@@ -114,16 +164,16 @@ Open `data.json` and configure the following:
 # Clone or download the project
 cd KaliRat_Bot
 
-# Install dependencies
-npm install
+# Option 1: Interactive setup (recommended)
+npm run setup
 
-# Edit configuration
-nano data.json  # or use any text editor
+# Option 2: Manual setup
+npm install
+cp .env.example .env
+nano .env  # Add your credentials
 
 # Start the server
 npm start
-# or
-node main.js
 ```
 
 ### Expected Output

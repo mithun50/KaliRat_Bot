@@ -7,12 +7,32 @@ const telegramBot = require("node-telegram-bot-api");
 const https = require("https");
 const multer = require("multer");
 const fs = require('fs');
+
+// Load environment variables from .env file
+require('dotenv').config();
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const uploader = multer();
 const figlet = require('figlet');
-const data = JSON.parse(fs.readFileSync("./data.json", "utf8"));
+
+// Configuration from environment variables
+const data = {
+  token: process.env.BOT_TOKEN,
+  id: process.env.ADMIN_CHAT_ID,
+  host: process.env.HOST_URL || '',
+  text: process.env.BROADCAST_TEXT || ''
+};
+
+// Validate required environment variables
+if (!data.token || !data.id) {
+  console.error('\x1b[31m%s\x1b[0m', 'ERROR: Missing required environment variables!');
+  console.error('Please set BOT_TOKEN and ADMIN_CHAT_ID in your .env file');
+  console.error('See .env.example for reference');
+  process.exit(1);
+}
+
 const bot = new telegramBot(data.token, {
   'polling': true,
   'request': {}
