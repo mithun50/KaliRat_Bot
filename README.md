@@ -193,13 +193,101 @@ listening on port 3000
 
 ## Deployment Options
 
-### Option 1: Render.com (Free)
+### Option 1: Render.com (Recommended - Free)
 
-1. Push code to GitHub (remove sensitive data.json)
-2. Create account at [render.com](https://render.com)
-3. New → Web Service → Connect repo
-4. Set environment variables for token/id
-5. Deploy
+Render.com offers free hosting with automatic deployments.
+
+#### Quick Deploy (One-Click)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+#### Manual Deploy
+
+**Step 1: Push to GitHub**
+```bash
+# Make sure your code is on GitHub
+git push origin main
+```
+
+**Step 2: Create Render Account**
+1. Go to [render.com](https://render.com)
+2. Sign up with GitHub
+
+**Step 3: Create Web Service**
+1. Click **New** → **Web Service**
+2. Connect your GitHub repository
+3. Configure settings:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `kalirat-bot` |
+| **Region** | Oregon (US West) |
+| **Branch** | `main` |
+| **Runtime** | Node |
+| **Build Command** | `npm install` |
+| **Start Command** | `npm start` |
+| **Plan** | Free |
+
+**Step 4: Set Environment Variables**
+
+In Render Dashboard → Environment → Add the following:
+
+| Key | Value | Required |
+|-----|-------|----------|
+| `BOT_TOKEN` | Your Telegram bot token | Yes |
+| `ADMIN_CHAT_ID` | Your Telegram chat ID | Yes |
+| `HOST_URL` | `https://your-app.onrender.com/` | Yes (for keep-alive) |
+| `PORT` | `3000` | No (auto-set) |
+| `KEEP_ALIVE_INTERVAL` | `840000` | No (default 14min) |
+
+**Step 5: Deploy**
+1. Click **Create Web Service**
+2. Wait for deployment (2-3 minutes)
+3. Copy your URL: `https://your-app.onrender.com`
+4. Update `HOST_URL` environment variable with this URL
+
+#### Keep-Alive (Prevent Sleep)
+
+Render free tier sleeps after 15 minutes of inactivity. This project includes built-in keep-alive:
+
+- **Self-ping** every 14 minutes (configurable via `KEEP_ALIVE_INTERVAL`)
+- **Health endpoint** at `/health` for monitoring
+- **Ping endpoint** at `/ping` for external monitors
+
+**External Keep-Alive Options:**
+
+1. **UptimeRobot** (Free) - [uptimerobot.com](https://uptimerobot.com)
+   - Add HTTP monitor for `https://your-app.onrender.com/health`
+   - Set interval to 5 minutes
+
+2. **Cron-job.org** (Free) - [cron-job.org](https://cron-job.org)
+   - Create job to ping `https://your-app.onrender.com/ping`
+   - Set schedule: `*/14 * * * *` (every 14 minutes)
+
+3. **GitHub Actions** (Free) - Add to `.github/workflows/keepalive.yml`:
+   ```yaml
+   name: Keep Alive
+   on:
+     schedule:
+       - cron: '*/14 * * * *'
+   jobs:
+     ping:
+       runs-on: ubuntu-latest
+       steps:
+         - run: curl https://your-app.onrender.com/ping
+   ```
+
+#### Verify Deployment
+
+```bash
+# Check health
+curl https://your-app.onrender.com/health
+
+# Expected response:
+# {"status":"ok","uptime":123.45,"timestamp":"...","connections":0}
+```
+
+---
 
 ### Option 2: Local Network (Testing)
 
@@ -212,7 +300,9 @@ node main.js
 ngrok http 3000
 ```
 
-### Option 3: VPS
+---
+
+### Option 3: VPS (DigitalOcean, AWS, etc.)
 
 ```bash
 # Install Node.js on VPS

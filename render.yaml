@@ -1,0 +1,46 @@
+# ===========================================
+# Render.com Deployment Configuration
+# ===========================================
+# This file defines how Render deploys the app
+# Docs: https://render.com/docs/blueprint-spec
+# ===========================================
+
+services:
+  # Main KaliRat Bot Server
+  - type: web
+    name: kalirat-bot
+    runtime: node
+    region: oregon  # Options: oregon, frankfurt, ohio, singapore
+    plan: free      # Options: free, starter, standard, pro
+
+    # Build settings
+    buildCommand: npm install
+    startCommand: npm start
+
+    # Health check endpoint
+    healthCheckPath: /health
+
+    # Environment variables
+    envVars:
+      # Required - Set these in Render Dashboard
+      - key: BOT_TOKEN
+        sync: false  # Must be set manually (secret)
+      - key: ADMIN_CHAT_ID
+        sync: false  # Must be set manually
+
+      # Optional with defaults
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: HOST_URL
+        sync: false  # Set to your Render URL after deployment
+
+      # Optional features
+      - key: BROADCAST_TEXT
+        sync: false
+      - key: KEEP_ALIVE_INTERVAL
+        value: 840000  # 14 minutes (before 15min sleep)
+
+    # Auto-deploy when pushing to main branch
+    autoDeploy: true

