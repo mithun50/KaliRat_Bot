@@ -401,80 +401,51 @@ apktool d CLIENT_src.apk -o CLIENT_decompiled
 
 ---
 
-### Step 2: Find the Server URL
+### Step 2: Edit Server URL
 
-The server URL is typically located in one of these places:
-
-#### Method 1: Search in smali files
+The server URL is located in **`assets/connection.json`**:
 
 ```bash
-# Search for URL patterns
-grep -r "http://" CLIENT_decompiled/smali/
-grep -r "https://" CLIENT_decompiled/smali/
-grep -r "socket" CLIENT_decompiled/smali/
-
-# Search for the current server URL
-grep -r "render" CLIENT_decompiled/smali/
-grep -r "kalirat" CLIENT_decompiled/smali/
+# Open the connection config file
+nano CLIENT_decompiled/assets/connection.json
 ```
 
-#### Method 2: Check common locations
-
-```bash
-# Check assets folder for config files
-ls CLIENT_decompiled/assets/
-
-# Check res/values for strings
-cat CLIENT_decompiled/res/values/strings.xml
+**Current content:**
+```json
+{
+  "host": "https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/"
+}
 ```
 
-#### Method 3: Use jadx (easier to read)
-
-```bash
-# Open in jadx-gui
-jadx-gui CLIENT_src.apk
-
-# Or command line
-jadx CLIENT_src.apk -d CLIENT_java
-
-# Search in decompiled Java
-grep -r "http" CLIENT_java/
+**Change to your server URL:**
+```json
+{
+  "host": "https://your-app.onrender.com/"
+}
 ```
+
+#### Examples:
+
+| Deployment | URL Format |
+|------------|------------|
+| Render.com | `https://kalirat-bot.onrender.com/` |
+| Heroku | `https://your-app.herokuapp.com/` |
+| Railway | `https://your-app.up.railway.app/` |
+| VPS | `https://your-domain.com/` or `http://YOUR_IP:3000/` |
+| Ngrok | `https://xxxx-xx-xx-xx-xx.ngrok-free.app/` |
+
+**Important:** Always include the trailing slash `/` at the end of the URL.
 
 ---
 
-### Step 3: Edit the Server URL
-
-Once you find the URL location, edit it:
-
-#### If in smali file:
+### Quick Edit Commands
 
 ```bash
-# Open the file containing the URL
-nano CLIENT_decompiled/smali/com/example/app/Config.smali
+# One-liner to replace URL (Termux/Linux)
+sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://your-server.onrender.com/|g' CLIENT_decompiled/assets/connection.json
 
-# Find line like:
-# const-string v0, "https://kalirat-bot.onrender.com/"
-
-# Change to your server:
-# const-string v0, "https://your-server.com/"
-```
-
-#### If in strings.xml:
-
-```bash
-nano CLIENT_decompiled/res/values/strings.xml
-
-# Find and edit:
-# <string name="server_url">https://your-server.com/</string>
-```
-
-#### If in assets:
-
-```bash
-nano CLIENT_decompiled/assets/config.json
-
-# Edit the URL in the config file
+# Verify the change
+cat CLIENT_decompiled/assets/connection.json
 ```
 
 ---
@@ -600,25 +571,33 @@ adb install CLIENT_signed.apk
 ### Quick Reference Commands
 
 ```bash
-# Complete workflow in Termux:
+# ===========================================
+# Complete APK Build Workflow (Termux/Linux)
+# ===========================================
 
 # 1. Decompile
 apktool d CLIENT_src.apk -o CLIENT_decompiled
 
-# 2. Edit server URL (find and replace)
-grep -r "onrender" CLIENT_decompiled/smali/
-# Edit the file found
+# 2. Edit server URL in assets/connection.json
+nano CLIENT_decompiled/assets/connection.json
+# Change: {"host": "https://your-app.onrender.com/"}
 
-# 3. Rebuild
+# Or use sed for quick replace:
+sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://your-app.onrender.com/|g' CLIENT_decompiled/assets/connection.json
+
+# 3. Verify the change
+cat CLIENT_decompiled/assets/connection.json
+
+# 4. Rebuild
 apktool b CLIENT_decompiled -o CLIENT_modified.apk
 
-# 4. Generate key (first time only)
+# 5. Generate signing key (first time only)
 keytool -genkey -v -keystore release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
 
-# 5. Sign
+# 6. Sign the APK
 apksigner sign --ks release.jks --out CLIENT_final.apk CLIENT_modified.apk
 
-# 6. Install
+# 7. Install
 adb install CLIENT_final.apk
 ```
 
@@ -635,6 +614,7 @@ CLIENT_src.apk
 │   ├── layout/              # UI layouts
 │   └── values/              # Strings, colors, styles
 ├── assets/                  # Raw files (configs, databases)
+│   └── connection.json      # ⚡ SERVER URL CONFIG (EDIT THIS!)
 ├── lib/                     # Native libraries (.so files)
 │   ├── armeabi-v7a/
 │   ├── arm64-v8a/
