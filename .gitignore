@@ -1,0 +1,138 @@
+# ===========================================
+# KaliRat Bot - Git Ignore
+# ===========================================
+
+# ===========================================
+# SENSITIVE FILES - NEVER COMMIT THESE!
+# ===========================================
+
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Configuration with real credentials
+# Use data.json.example as template
+# data.json  # Uncomment if you want to ignore
+
+# Keystore files (APK signing keys)
+*.jks
+*.keystore
+release.jks
+debug.keystore
+my-release-key.jks
+
+# ===========================================
+# NODE.JS
+# ===========================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Package lock (optional - some prefer to commit this)
+# package-lock.json
+
+# ===========================================
+# APK BUILD FILES
+# ===========================================
+
+# Decompiled APK folders
+CLIENT_decompiled/
+*_decompiled/
+*_java/
+
+# Modified/unsigned APKs
+*_modified.apk
+*_unsigned.apk
+*_aligned.apk
+
+# Signed output (keep original CLIENT_src.apk)
+CLIENT_signed.apk
+CLIENT_final.apk
+
+# APK tool cache
+apktool.yml.bak
+
+# ===========================================
+# UPLOADS & LOGS
+# ===========================================
+
+# Uploaded files from devices
+uploads/
+files/
+received/
+
+# Log files
+logs/
+*.log
+
+# ===========================================
+# IDE & EDITOR
+# ===========================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (IntelliJ, Android Studio)
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ===========================================
+# OS GENERATED
+# ===========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# ===========================================
+# MISC
+# ===========================================
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Build output
+dist/
+build/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Documentation build
+docs/_build/

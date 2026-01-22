@@ -1,0 +1,6 @@
+{
+    "token": "YOUR_TELEGRAM_BOT_TOKEN",
+    "id": "YOUR_TELEGRAM_CHAT_ID",
+    "host": "https://your-server-url.com/",
+    "text": "Optional broadcast message for SMS feature"
+}
